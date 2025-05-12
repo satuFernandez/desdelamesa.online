@@ -238,13 +238,31 @@
         customAlert.classList.remove('hidden');
       }
 
-      form.addEventListener('submit', (e) => {
+      form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = document.getElementById('email').value;
-        console.log('Email enviado:', email);
-        popup.classList.add('hidden');
-        showCustomAlert('Gracias, te avisaremos pronto');
-        form.reset();
+
+        try {
+          //const response = await fetch('http://localhost:8080/api/v1/notifyme/email', {
+          const response = await fetch('https://notifyme.desdelamesa.online/api/v1/notifyme/email', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email: email })
+          });
+
+          if (response.ok) {
+            popup.classList.add('hidden');
+            showCustomAlert('Gracias, te avisaremos pronto');
+            form.reset();
+          } else {
+            showCustomAlert('Error al enviar tu correo. Inténtalo de nuevo');
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          showCustomAlert('No se pudo conectar con el servidor. Inténtalo más tarde');
+        }
       });
     });
   </script>
